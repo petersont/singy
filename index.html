@@ -1,0 +1,110 @@
+
+<html>
+
+<head>
+
+<script src="jquery-2.1.0.min.js"></script>
+
+<script>
+
+var g_audioCtx = null;
+var g_song = function(t){return 0;};
+var g_index = 0;
+var g_startTime = 0;
+
+function init()
+{
+    g_startTime = 0;
+    var AudioContext = window.AudioContext || window.webkitAudioContext;
+    g_audioCtx = new AudioContext();
+}
+
+function process(evt)
+{
+    var array0 = evt.outputBuffer.getChannelData(0);
+    for( var i = 0; i < array0.length; i++ )
+    {
+        var t = g_index / g_audioCtx.sampleRate;
+        array0[i] = g_song(t);
+        g_index++;
+    }
+}
+
+var g_node = null;
+
+function start(song)
+{
+    g_song = song;
+    g_node = g_audioCtx.createScriptProcessor(1024, 0, 2);
+    g_index = 0;
+    g_node.onaudioprocess = process;
+    g_node.connect(g_audioCtx.destination);
+}
+
+function stop()
+{
+    g_node.disconnect();
+}
+
+function song(t)
+{
+    return 1.0 * Math.sin( 2.0 * 5.0 * Math.PI * t ) * Math.sin( 2.0 * Math.PI * 220.0 * t );
+}
+
+var g_playing = false;
+function togglePlay()
+{
+    if( g_playing )
+    {
+        stop();
+        g_playing = false;
+        $(".avitar").removeClass("playing");
+    }
+    else
+    {
+        start(song);
+        g_playing = true;
+        $(".avitar").addClass("playing");
+    }
+}
+
+</script>
+
+<style>
+body {
+    background-color: #000;
+}
+
+.avitar .idle {
+    display: inline-block;
+}
+
+.avitar .singing {
+    display: none;
+}
+
+.playing.avitar .idle {
+    display: none;
+}
+
+.playing.avitar .singing {
+    display: inline-block;
+}
+
+
+</style>
+
+</head>
+
+<body onload="init();">
+<div class="avitar" onclick="togglePlay();">
+<div class="idle"><img src = "lisaur_idle.gif"></div>
+<div class="singing"><img src = "lisaur_singing.gif"></div>
+</div>
+</body>
+
+
+<br>
+
+</html>
+
