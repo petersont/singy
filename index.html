@@ -8,58 +8,87 @@
 <script>
 
 var g_audioCtx = null;
-var g_song = function(t){return 0;};
-var g_index = 0;
-var g_startTime = 0;
 
 function init()
 {
-    g_startTime = 0;
     var AudioContext = window.AudioContext || window.webkitAudioContext;
     g_audioCtx = new AudioContext();
+    insertAvitar( "peter", 0 );
+    insertAvitar( "lisa", 1 );
 
-    loadSound( "peter_A.wav" );
+    togglePlay();
 }
 
 var loadedBuffer = null;
 
 var SoundPool = function()
 {
+    this.buffers = [null, null, null, null, null, null, null, null];
+    this.index = 0;
 }
+
+SoundPool.prototype.add = function(buffer, trackIndex, finishedCallback)
+{
+    this.buffers[trackIndex] = {
+        start: this.index,
+        buffer: buffer,
+        numSamples: buffer.length,
+        finished: finishedCallback
+    };
+}
+
+SoundPool.prototype.sample = function(array0, array1, arrayIndex)
+{
+    array0[arrayIndex] = 0;
+    array1[arrayIndex] = 0;
+
+    for(var i = 0; i < this.buffers.length; i++)
+    {
+        var buffer = this.buffers[i];
+        if( buffer )
+        {
+            var start = buffer.start;
+            var k = this.index-start;
+
+            if( k < 0 )
+            {
+                continue;
+            }
+
+            if( k > buffer.numSamples )
+            {
+                buffer.finished();
+                this.buffers[i] = null;
+                continue;
+            }
+
+            var inarray = buffer.buffer.getChannelData(0);
+
+            array0[arrayIndex] += inarray[k];
+            array1[arrayIndex] += inarray[k];
+        }
+    }
+
+    this.index++;
+}
+
+var g_soundPool = new SoundPool();
 
 function process_from_buffer(evt)
 {
-    var inarray0 = loadedBuffer.getChannelData(0);
-    var inarray1 = loadedBuffer.getChannelData(1);
-
     var array0 = evt.outputBuffer.getChannelData(0);
     var array1 = evt.outputBuffer.getChannelData(1);
 
     for( var i = 0; i < array0.length; i++ )
     {
-        var t = g_index / g_audioCtx.sampleRate;
-        array0[i] = inarray0[g_index];
-        array1[i] = inarray1[g_index];
-        g_index++;
-    }
-}
-
-function process(evt)
-{
-    var array0 = evt.outputBuffer.getChannelData(0);
-    for( var i = 0; i < array0.length; i++ )
-    {
-        var t = g_index / g_audioCtx.sampleRate;
-        array0[i] = g_song(t);
-        g_index++;
+        g_soundPool.sample(array0, array1, i);
     }
 }
 
 var g_node = null;
 
-function start(song)
+function start()
 {
-    g_song = song;
     g_node = g_audioCtx.createScriptProcessor(1024, 0, 2);
     g_index = 0;
     g_node.onaudioprocess = process_from_buffer;
@@ -71,11 +100,6 @@ function stop()
     g_node.disconnect();
 }
 
-function song(t)
-{
-    return 1.0 * Math.sin( 2.0 * 5.0 * Math.PI * t ) * Math.sin( 2.0 * Math.PI * 220.0 * t );
-}
-
 var g_playing = false;
 function togglePlay()
 {
@@ -83,23 +107,20 @@ function togglePlay()
     {
         stop();
         g_playing = false;
-        $(".avitar").removeClass("playing");
     }
     else
     {
-        start(song);
+        start();
         g_playing = true;
-        $(".avitar").addClass("playing");
     }
 }
-
 
 function onError()
 {
     debugger;
 }
 
-function loadSound(url)
+function loadSound(url, buffers)
 {
     var request = new XMLHttpRequest();
     request.open('GET', url, true);
@@ -111,13 +132,41 @@ function loadSound(url)
             request.response,
             function(buffer)
             {
-                loadedBuffer = buffer;
-                debugger;
+                buffers["A"] = buffer;
             },
             onError
         );
     }
     request.send();
+}
+
+function insertAvitar(name, trackIndex)
+{
+    var avitar = $('<div>').append(
+        $('<div>').addClass("idle").append($('<img src = ' + name + '_idle.gif>')),
+        $('<div>').addClass("singing").append($('<img src = ' + name + '_singing.gif>'))
+    );
+
+    avitar.addClass("avitar");
+
+    var buffers = {};
+
+    loadSound(name + "_A.m4a", buffers);
+
+    avitar.on('click',
+        function()
+        {
+            avitar.addClass("playing");
+            g_soundPool.add( buffers["A"], trackIndex,
+                function()
+                {
+                    avitar.removeClass("playing");
+                }
+            );
+        }
+    );
+
+    $("#root").append( avitar );
 }
 
 
@@ -149,14 +198,9 @@ body {
 </head>
 
 <body onload="init();">
-<div class="avitar" onclick="togglePlay();">
-<div class="idle"><img src = "lisaur_idle.gif"></div>
-<div class="singing"><img src = "lisaur_singing.gif"></div>
-</div>
+<div id="root"></div>
 </body>
 
-
-<br>
 
 </html>
 
