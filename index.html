@@ -17,6 +17,31 @@ function init()
     g_startTime = 0;
     var AudioContext = window.AudioContext || window.webkitAudioContext;
     g_audioCtx = new AudioContext();
+
+    loadSound( "peter_A.wav" );
+}
+
+var loadedBuffer = null;
+
+var SoundPool = function()
+{
+}
+
+function process_from_buffer(evt)
+{
+    var inarray0 = loadedBuffer.getChannelData(0);
+    var inarray1 = loadedBuffer.getChannelData(1);
+
+    var array0 = evt.outputBuffer.getChannelData(0);
+    var array1 = evt.outputBuffer.getChannelData(1);
+
+    for( var i = 0; i < array0.length; i++ )
+    {
+        var t = g_index / g_audioCtx.sampleRate;
+        array0[i] = inarray0[g_index];
+        array1[i] = inarray1[g_index];
+        g_index++;
+    }
 }
 
 function process(evt)
@@ -37,7 +62,7 @@ function start(song)
     g_song = song;
     g_node = g_audioCtx.createScriptProcessor(1024, 0, 2);
     g_index = 0;
-    g_node.onaudioprocess = process;
+    g_node.onaudioprocess = process_from_buffer;
     g_node.connect(g_audioCtx.destination);
 }
 
@@ -68,6 +93,34 @@ function togglePlay()
     }
 }
 
+
+function onError()
+{
+    debugger;
+}
+
+function loadSound(url)
+{
+    var request = new XMLHttpRequest();
+    request.open('GET', url, true);
+    request.responseType = 'arraybuffer';
+
+    request.onload = function()
+    {
+        g_audioCtx.decodeAudioData(
+            request.response,
+            function(buffer)
+            {
+                loadedBuffer = buffer;
+                debugger;
+            },
+            onError
+        );
+    }
+    request.send();
+}
+
+
 </script>
 
 <style>
@@ -90,7 +143,6 @@ body {
 .playing.avitar .singing {
     display: inline-block;
 }
-
 
 </style>
 
