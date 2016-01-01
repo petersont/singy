@@ -14,8 +14,10 @@ function init()
 {
     var AudioContext = window.AudioContext || window.webkitAudioContext;
     g_audioCtx = new AudioContext();
-    insertAvitar( $("#root"), "peter", 0 );
-    insertAvitar( $("#root"), "lisa", 1 );
+    insertAvitar( $("#avitar-root"), "peter", 0 );
+    insertAvitar( $("#avitar-root"), "lisa", 1 );
+
+    insertTracker( $("#tracker-root") );
 
     togglePlay();
 }
@@ -170,6 +172,26 @@ function insertAvitar(container, name, trackIndex)
     container.append( avitar );
 }
 
+function insertTracker(container)
+{
+    var tracker = $('<div>').addClass('column');
+
+    for( var j = 0; j < 16 * 4; j++ )
+    {
+        var column = $('<div>').addClass('column');
+        for( var i = 0; i < 44; i++ )
+            column.append( $('<div>').addClass('brick') );
+        tracker.append(column);
+
+        var d = 0;
+        while( j%(1<<d) == 0 && d < 4 ) {d++;}
+
+        column.css({borderLeftStyle:'solid', borderLeftWidth:'1px', borderLeftColor:
+            {0:"#111", 1:"#222", 2:"#444", 3:"#666", 4:"#999", 5:"#fff"}[d-1] });
+    }
+
+    container.append( tracker );
+}
 
 
 </script>
@@ -178,7 +200,8 @@ function insertAvitar(container, name, trackIndex)
 </head>
 
 <body onload="init();">
-<div id="root"></div>
+<div id="avitar-root"></div>
+<div id="tracker-root"></div>
 </body>
 
 
