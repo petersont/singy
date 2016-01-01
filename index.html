@@ -4,6 +4,7 @@
 <head>
 
 <script src="jquery-2.1.0.min.js"></script>
+<link rel=stylesheet type=text/css href="singy.css"/>
 
 <script>
 
@@ -13,8 +14,8 @@ function init()
 {
     var AudioContext = window.AudioContext || window.webkitAudioContext;
     g_audioCtx = new AudioContext();
-    insertAvitar( "peter", 0 );
-    insertAvitar( "lisa", 1 );
+    insertAvitar( $("#root"), "peter", 0 );
+    insertAvitar( $("#root"), "lisa", 1 );
 
     togglePlay();
 }
@@ -140,7 +141,7 @@ function loadSound(url, buffers)
     request.send();
 }
 
-function insertAvitar(name, trackIndex)
+function insertAvitar(container, name, trackIndex)
 {
     var avitar = $('<div>').append(
         $('<div>').addClass("idle").append($('<img src = ' + name + '_idle.gif>')),
@@ -166,34 +167,13 @@ function insertAvitar(name, trackIndex)
         }
     );
 
-    $("#root").append( avitar );
+    container.append( avitar );
 }
+
 
 
 </script>
 
-<style>
-body {
-    background-color: #000;
-}
-
-.avitar .idle {
-    display: inline-block;
-}
-
-.avitar .singing {
-    display: none;
-}
-
-.playing.avitar .idle {
-    display: none;
-}
-
-.playing.avitar .singing {
-    display: inline-block;
-}
-
-</style>
 
 </head>
 
