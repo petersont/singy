@@ -139,7 +139,7 @@ function loadSound(url, buffers)
             {
                 buffers["A"] = buffer;
             },
-            onError
+            errorHandler("file not found: " + url);
         );
     }
     request.send();
