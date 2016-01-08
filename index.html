@@ -119,7 +119,10 @@ function togglePlay()
 
 function errorHandler(msg)
 {
-    console.log(msg);
+    return function()
+    {
+        console.log(msg);
+    }
 }
 
 function loadSound(url, buffers)
