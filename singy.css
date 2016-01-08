@@ -1,0 +1,45 @@
+
+body {
+    background-color: #000;
+}
+
+#avitar-root {
+    margin: 10px;
+}
+
+#tracker-root {
+    margin: 10px;
+}
+
+.avitar {
+    display: inline-block;
+}
+
+.avitar .idle {
+    display: inline-block;
+}
+
+.avitar .singing {
+    display: none;
+}
+
+.playing.avitar .idle {
+    display: none;
+}
+
+.playing.avitar .singing {
+    display: inline-block;
+}
+
+div.brick {
+
+    display: block;
+    width: 10px;
+    height: 10px;
+    margin-top: 1px;
+    background-color: #181818;
+}
+
+div.column {
+    display: inline-block;
+}
