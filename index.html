@@ -147,8 +147,8 @@ function loadSound(url, buffers)
 function insertAvitar(container, name, trackIndex)
 {
     var avitar = $('<div>').append(
-        $('<div>').addClass("idle").append($('<img src = ' + name + '_idle.gif>')),
-        $('<div>').addClass("singing").append($('<img src = ' + name + '_singing.gif>'))
+        $('<div>').addClass("idle").append($('<img src = ' + 'images/' + name + '_idle.gif>')),
+        $('<div>').addClass("singing").append($('<img src = ' + 'images/' +  name + '_singing.gif>'))
     );
 
     avitar.addClass("avitar");
