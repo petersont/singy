@@ -1,4 +1,3 @@
-
 <html>
 
 <head>
@@ -118,9 +117,12 @@ function togglePlay()
     }
 }
 
-function onError()
+function errorHandler(msg)
 {
-    debugger;
+    return function()
+    {
+        console.log(msg);
+    };
 }
 
 function loadSound(url, buffers)
@@ -137,7 +139,7 @@ function loadSound(url, buffers)
             {
                 buffers["A"] = buffer;
             },
-            onError
+            errorHandler("file not found: " + url)
         );
     }
     request.send();
@@ -146,15 +148,15 @@ function loadSound(url, buffers)
 function insertAvitar(container, name, trackIndex)
 {
     var avitar = $('<div>').append(
-        $('<div>').addClass("idle").append($('<img src = ' + name + '_idle.gif>')),
-        $('<div>').addClass("singing").append($('<img src = ' + name + '_singing.gif>'))
+        $('<div>').addClass("idle").append($('<img src = ' + 'images/' + name + '_idle.gif>')),
+        $('<div>').addClass("singing").append($('<img src = ' + 'images/' +  name + '_singing.gif>'))
     );
 
     avitar.addClass("avitar");
 
     var buffers = {};
 
-    loadSound(name + "_A.m4a", buffers);
+    loadSound("sounds/" + name + "_A.m4a", buffers);
 
     avitar.on('click',
         function()
@@ -203,7 +205,6 @@ function insertTracker(container)
 <div id="avitar-root"></div>
 <div id="tracker-root"></div>
 </body>
-
 
 </html>
 
