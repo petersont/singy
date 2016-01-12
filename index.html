@@ -16,8 +16,10 @@ function init()
     insertAvitar( $("#avitar-root"), "peter", 0 );
     insertAvitar( $("#avitar-root"), "lisa", 1 );
 
-    insertTracker( $("#tracker-root") );
-    initTrackerEventHandlers( $("#tracker-root") );
+    var trackerRoot = $("#tracker-root");
+    insertTracker( trackerRoot );
+    initTrackerEventHandlers( trackerRoot );
+    initTrackerCursor( trackerRoot )
 
     togglePlay();
 }
@@ -177,7 +179,7 @@ function insertAvitar(container, name, trackIndex)
 
 function insertTracker(container)
 {
-    var tracker = $('<div>').addClass('tracker');
+    var tracker = $('<div id="baloney">').addClass('tracker');
 
     for( var j = 0; j < 16 * 4; j++ )
     {
@@ -206,7 +208,7 @@ function initTrackerEventHandlers(container)
         if( $brick.data('color') )
             $brick.css({backgroundColor: '#f00'});
         else
-            $brick.css({backgroundColor: '#181818'});
+            $brick.css({backgroundColor: 'rgba(20,20,20,0.5)'});
     }
 
     container.find('.brick').mousedown( function()
@@ -226,6 +228,18 @@ function initTrackerEventHandlers(container)
         updateDisplayColor($(this));
     });
 
+    container.find('.tracker').on('mouseleave', function(evt)
+    {
+        color = 0;
+        mouseIsDown = false;
+    });
+
+    container.find('.tracker').on('mouseup', function(evt)
+    {
+        color = 0;
+        mouseIsDown = false;
+    });
+
     container.find('.brick').mouseup( function()
     {
         color = 0;
@@ -242,6 +256,28 @@ function initTrackerEventHandlers(container)
         }
     });
 }
+
+function initTrackerCursor(container)
+{
+    var cursorPosition = 0;
+
+    $(document).on('keydown', function(evt)
+    {
+        if( evt.keyCode == 32 )
+        {
+            var columns = container.find('div.column');
+            columns.removeClass('cursor-glow');
+            columns.eq(cursorPosition).addClass('cursor-glow');
+
+            cursorPosition++;
+            if( cursorPosition > columns.length )
+            {
+                cursorPosition = 0;
+            }
+        }
+    });
+}
+
 
 </script>
 

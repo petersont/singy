@@ -32,6 +32,7 @@ body {
 }
 
 div.tracker {
+    display: inline-block;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
@@ -46,10 +47,13 @@ div.brick {
     width: 10px;
     height: 10px;
     margin-top: 1px;
-    background-color: #181818;
+    background-color: rgba(20,20,20,0.5);
 }
 
 div.column {
     display: inline-block;
 }
 
+div.column.cursor-glow {
+    background-color: #ff0;
+}
