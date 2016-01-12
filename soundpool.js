@@ -15,16 +15,6 @@ SoundPool.prototype.add = function(buffer, trackIndex, finishedCallback)
     };
 };
 
-SoundPool.prototype.addAtTime = function(buffer, trackIndex, finishedCallback)
-{
-    this.buffers[trackIndex] = {
-        start: ,
-        buffer: buffer,
-        numSamples: buffer.length,
-        finished: finishedCallback
-    };
-};
-
 SoundPool.prototype.sample = function(array0, array1, arrayIndex)
 {
     array0[arrayIndex] = 0;

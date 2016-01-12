@@ -196,19 +196,35 @@ function initTrackerEventHandlers(container)
 function initTrackerCursor(container)
 {
     var cursorPosition = 0;
+    var timer = null;
+
+    function advance()
+    {
+        var columns = container.find('div.column');
+        columns.removeClass('cursor-glow');
+        columns.eq(cursorPosition).addClass('cursor-glow');
+
+        cursorPosition++;
+        if( cursorPosition > columns.length )
+        {
+            cursorPosition = 0;
+        }
+    }
 
     $(document).on('keydown', function(evt)
     {
         if( evt.keyCode == 32 )
         {
-            var columns = container.find('div.column');
-            columns.removeClass('cursor-glow');
-            columns.eq(cursorPosition).addClass('cursor-glow');
-
-            cursorPosition++;
-            if( cursorPosition > columns.length )
+            if( timer )
             {
+                clearInterval( timer );
+                timer = null;
+                container.find('div.column').removeClass('cursor-glow');
                 cursorPosition = 0;
+            }
+            else
+            {
+                timer = setInterval( advance, 150 );
             }
         }
     });
