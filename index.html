@@ -17,6 +17,7 @@ function init()
     insertAvitar( $("#avitar-root"), "lisa", 1 );
 
     insertTracker( $("#tracker-root") );
+    initTrackerEventHandlers( $("#tracker-root") );
 
     togglePlay();
 }
@@ -176,7 +177,7 @@ function insertAvitar(container, name, trackIndex)
 
 function insertTracker(container)
 {
-    var tracker = $('<div>').addClass('column');
+    var tracker = $('<div>').addClass('tracker');
 
     for( var j = 0; j < 16 * 4; j++ )
     {
@@ -195,6 +196,52 @@ function insertTracker(container)
     container.append( tracker );
 }
 
+function initTrackerEventHandlers(container)
+{
+    var color = 0;
+    var mouseIsDown = false;
+
+    function updateDisplayColor($brick)
+    {
+        if( $brick.data('color') )
+            $brick.css({backgroundColor: '#f00'});
+        else
+            $brick.css({backgroundColor: '#181818'});
+    }
+
+    container.find('.brick').mousedown( function()
+    {
+        mouseIsDown = true;
+        var currentColor = $(this).data('color') || 0;
+        if( currentColor == 0 )
+        {
+            color = 1;
+        }
+        else
+        {
+            color = 0;
+        }
+        $(this).data('color', color);
+
+        updateDisplayColor($(this));
+    });
+
+    container.find('.brick').mouseup( function()
+    {
+        color = 0;
+        mouseIsDown = false;
+        updateDisplayColor($(this));
+    });
+
+    container.find('.brick').mouseenter( function()
+    {
+        if( mouseIsDown )
+        {
+            $(this).data('color', color);
+            updateDisplayColor($(this));
+        }
+    });
+}
 
 </script>
 
