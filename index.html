@@ -21,7 +21,7 @@ function init()
     initTrackerEventHandlers( trackerRoot );
     initTrackerCursor( trackerRoot )
 
-    togglePlay();
+    start();
 }
 
 var loadedBuffer = null;
@@ -103,21 +103,6 @@ function start()
 function stop()
 {
     g_node.disconnect();
-}
-
-var g_playing = false;
-function togglePlay()
-{
-    if( g_playing )
-    {
-        stop();
-        g_playing = false;
-    }
-    else
-    {
-        start();
-        g_playing = true;
-    }
 }
 
 function errorHandler(msg)
