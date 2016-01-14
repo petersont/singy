@@ -17,6 +17,7 @@ SoundPool.prototype.add = function(buffer, trackIndex, finishedCallback)
 
 SoundPool.prototype.stopTrack = function(trackIndex)
 {
+    this.buffers[trackIndex].finished();
     this.buffers[trackIndex] = null;
 };
 
