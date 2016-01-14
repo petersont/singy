@@ -42,12 +42,16 @@ div.tracker {
     cursor: default;
 }
 
-div.brick {
+div.block {
     display: block;
     width: 10px;
     height: 10px;
     margin-top: 1px;
     background-color: rgba(20,20,20,0.5);
+}
+
+div.block.peter {
+    background-color: #f00;
 }
 
 div.column {
