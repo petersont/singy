@@ -18,6 +18,8 @@ function init()
     insertAvitar( $("#avitar-root"), "peter", 0 );
     insertAvitar( $("#avitar-root"), "lisa", 1 );
 
+    initTone();
+
     var trackerRoot = $("#tracker-root");
     insertTracker( trackerRoot );
     initTrackerEventHandlers( trackerRoot );
@@ -64,8 +66,10 @@ function errorHandler(msg)
     };
 }
 
-function loadSound(url, buffers)
+function loadSound(url, buffers, index)
 {
+    index = index || "A";
+
     var request = new XMLHttpRequest();
     request.open('GET', url, true);
     request.responseType = 'arraybuffer';
@@ -76,7 +80,7 @@ function loadSound(url, buffers)
             request.response,
             function(buffer)
             {
-                buffers["A"] = buffer;
+                buffers[index] = buffer;
             },
             errorHandler("file not found: " + url)
         );
@@ -85,6 +89,20 @@ function loadSound(url, buffers)
 }
 
 var g_voiceInfo = {};
+
+function initTone()
+{
+    var buffers = {};
+    g_voiceInfo["tone"] = {
+        buffers: buffers,
+        $avitar: $()
+    };
+
+    for( var i = 0; i < 48; i++ )
+    {
+        loadSound("sounds/tone" + i + ".m4a", buffers, i);
+    }
+}
 
 function insertAvitar(container, name, trackIndex)
 {
@@ -126,7 +144,7 @@ function insertTracker(container)
     for( var j = 0; j < 16 * 4; j++ )
     {
         var column = $('<div>').addClass('column');
-        for( var i = 0; i < 44; i++ )
+        for( var i = 0; i < 48; i++ )
             column.append( $('<div>').addClass('block') );
         tracker.append(column);
 
@@ -213,6 +231,8 @@ function initTrackerCursor(container)
         var blocksInColumn =  currentColumn.find('.block');
 
         var partOn = false;
+        var note = -1;
+
         for( var i = 0; i < blocksInColumn.length; i++ )
         {
             var $block = blocksInColumn.eq(i);
@@ -220,23 +240,27 @@ function initTrackerCursor(container)
             if( $block.hasClass("peter") )
             {
                 partOn = true;
+                note = blocksInColumn.length-1-i;
             }
         }
 
-        if( partOn && parts["peter"]<0 )
+        if( parts["peter"]!=note )
         {
-            g_voiceInfo["peter"].$avitar.addClass("playing");
-            g_soundPool.add( g_voiceInfo["peter"].buffers["A"], 1,
-                function()
-                {
-                    g_voiceInfo["peter"].$avitar.removeClass("playing");
-                } );
-            parts["peter"] = 1;
-        }
-        else if( ! partOn && parts["peter"]>=0 )
-        {
-            g_soundPool.stopTrack( 1 );
-            parts["peter"] = -1;
+            if( partOn )
+            {
+                g_voiceInfo["peter"].$avitar.addClass("playing");
+                g_soundPool.add( g_voiceInfo["tone"].buffers[note], 1,
+                    function()
+                    {
+                        g_voiceInfo["peter"].$avitar.removeClass("playing");
+                    } );
+                parts["peter"] = note;
+            }
+            else
+            {
+                g_soundPool.stopTrack( 1 );
+                parts["peter"] = -1;
+            }
         }
     }
 
@@ -250,6 +274,7 @@ function initTrackerCursor(container)
                 timer = null;
                 container.find('div.column').removeClass('cursor-glow');
                 cursorPosition = 0;
+                g_soundPool.clear();
             }
             else
             {

@@ -1,8 +1,7 @@
 
 var SoundPool = SoundPool || function()
 {
-    this.buffers = [null, null, null, null, null, null, null, null];
-    this.index = 0;
+    this.clear();
 };
 
 SoundPool.prototype.add = function(buffer, trackIndex, finishedCallback)
@@ -20,6 +19,12 @@ SoundPool.prototype.stopTrack = function(trackIndex)
     this.buffers[trackIndex].finished();
     this.buffers[trackIndex] = null;
 };
+
+SoundPool.prototype.clear = function()
+{
+    this.buffers = [null, null, null, null, null, null, null, null];
+    this.index = 0;
+}
 
 SoundPool.prototype.sample = function(array0, array1, arrayIndex)
 {
