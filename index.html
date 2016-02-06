@@ -92,26 +92,24 @@ var g_voiceInfo = {};
 
 function initVoices()
 {
-    var buffers = {};
-    g_voiceInfo["tone"] = {
-        buffers: buffers,
-        $avitar: $()
-    };
 
-    for( var i = 0; i < 48; i++ )
+    function loadVoice( voiceName )
     {
-        loadSound("sounds/tone" + i + ".m4a", buffers, i);
+        var buffers = {};
+        g_voiceInfo[voiceName] = {
+            buffers: buffers,
+            $avitar: $()
+        };
+
+        for( var i = 0; i < 48; i++ )
+        {
+            loadSound("sounds/" + voiceName + i + ".m4a", buffers, i);
+        }
     }
 
-    for( var i = 0; i < 48; i++ )
-    {
-        loadSound("sounds/lisa" + i + ".m4a", buffers, i);
-    }
-
-    for( var i = 0; i < 48; i++ )
-    {
-        loadSound("sounds/peter" + i + ".m4a", buffers, i);
-    }
+    loadVoice("tone");
+    loadVoice("peter");
+    loadVoice("lisa");
 }
 
 function insertAvitar(container, name, trackIndex)
@@ -134,13 +132,9 @@ function insertAvitar(container, name, trackIndex)
     avitar.on('click',
         function()
         {
-            avitar.addClass("playing");
-            g_soundPool.add( buffers["A"], trackIndex,
-                function()
-                {
-                    avitar.removeClass("playing");
-                }
-            );
+            $(".avitar").removeClass("selected");
+            avitar.addClass("selected");
+            g_currentPartClass = name;
         }
     );
 
@@ -168,24 +162,25 @@ function insertTracker(container)
     container.append( tracker );
 }
 
+var g_currentPartClass = 'peter';
+
 function initTrackerEventHandlers(container)
 {
-    var currentPartClass = 'peter';
     var paint = false;
     var mouseIsDown = false;
 
     var colorBlock = function($block)
     {
         if( paint )
-            $block.addClass(currentPartClass);
+            $block.addClass(g_currentPartClass);
         else
-            $block.removeClass(currentPartClass);
+            $block.removeClass(g_currentPartClass);
     }
 
     container.find('.block').mousedown( function()
     {
         mouseIsDown = true;
-        paint = ! $(this).hasClass(currentPartClass);
+        paint = ! $(this).hasClass(g_currentPartClass);
         colorBlock($(this));
     });
 
@@ -240,39 +235,47 @@ function initTrackerCursor(container)
         currentColumn.addClass('cursor-glow');
         var blocksInColumn =  currentColumn.find('.block');
 
-        var partOn = false;
-        var note = -1;
+        var partNames = ["peter", "lisa"];
 
-        for( var i = 0; i < blocksInColumn.length; i++ )
+        for( var partNameIndex = 0; partNameIndex < partNames.length; partNameIndex++ )
         {
-            var $block = blocksInColumn.eq(i);
+            var partName = partNames[partNameIndex];
+            var partOn = false;
+            var note = -1;
+            var trackIndex = partNameIndex+1;
 
-            if( $block.hasClass("peter") )
+            for( var i = 0; i < blocksInColumn.length; i++ )
             {
-                partOn = true;
-                note = blocksInColumn.length-1-i;
+                var $block = blocksInColumn.eq(i);
+
+                if( $block.hasClass(partName) )
+                {
+                    partOn = true;
+                    note = blocksInColumn.length-1-i;
+                }
             }
-        }
 
-        if( parts["peter"]!=note )
-        {
-            if( partOn )
+            if( parts[partName]!=note )
             {
-                g_voiceInfo["peter"].$avitar.addClass("playing");
+                if( partOn )
+                {
+                    g_voiceInfo[partName].$avitar.addClass("playing");
 
-                var buffer = g_voiceInfo["peter"].buffers[note] || g_voiceInfo["tone"].buffers[note];
+                    var buffer = g_voiceInfo[partName].buffers[note] || g_voiceInfo["tone"].buffers[note];
 
-                g_soundPool.add( buffer, 1,
-                    function()
-                    {
-                        g_voiceInfo["peter"].$avitar.removeClass("playing");
-                    } );
-                parts["peter"] = note;
-            }
-            else
-            {
-                g_soundPool.stopTrack( 1 );
-                parts["peter"] = -1;
+                    g_soundPool.add( buffer, trackIndex,
+                        function()
+                        {
+                            g_voiceInfo[partName].$avitar.removeClass("playing");
+                        }
+                    );
+                    parts[partName] = note;
+                }
+                else
+                {
+                    g_soundPool.stopTrack( trackIndex );
+                    parts[partName] = -1;
+                }
             }
         }
     }

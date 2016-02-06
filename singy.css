@@ -13,6 +13,7 @@ body {
 
 .avitar {
     display: inline-block;
+    margin: 2px;
 }
 
 .avitar .idle {
@@ -29,6 +30,10 @@ body {
 
 .playing.avitar .singing {
     display: inline-block;
+}
+
+.avitar.selected {
+    outline: 1px solid #fff;
 }
 
 div.tracker {
@@ -52,6 +57,10 @@ div.block {
 
 div.block.peter {
     background-color: #f00;
+}
+
+div.block.lisa {
+    background-color: #0f0;
 }
 
 div.column {
