@@ -107,6 +107,11 @@ function initVoices()
     {
         loadSound("sounds/lisa" + i + ".m4a", buffers, i);
     }
+
+    for( var i = 0; i < 48; i++ )
+    {
+        loadSound("sounds/peter" + i + ".m4a", buffers, i);
+    }
 }
 
 function insertAvitar(container, name, trackIndex)
@@ -255,7 +260,7 @@ function initTrackerCursor(container)
             {
                 g_voiceInfo["peter"].$avitar.addClass("playing");
 
-                var buffer = g_voiceInfo["lisa"].buffers[note] || g_voiceInfo["tone"].buffers[note];
+                var buffer = g_voiceInfo["peter"].buffers[note] || g_voiceInfo["tone"].buffers[note];
 
                 g_soundPool.add( buffer, 1,
                     function()
