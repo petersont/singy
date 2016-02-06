@@ -18,7 +18,7 @@ function init()
     insertAvitar( $("#avitar-root"), "peter", 0 );
     insertAvitar( $("#avitar-root"), "lisa", 1 );
 
-    initTone();
+    initVoices();
 
     var trackerRoot = $("#tracker-root");
     insertTracker( trackerRoot );
@@ -90,7 +90,7 @@ function loadSound(url, buffers, index)
 
 var g_voiceInfo = {};
 
-function initTone()
+function initVoices()
 {
     var buffers = {};
     g_voiceInfo["tone"] = {
@@ -101,6 +101,11 @@ function initTone()
     for( var i = 0; i < 48; i++ )
     {
         loadSound("sounds/tone" + i + ".m4a", buffers, i);
+    }
+
+    for( var i = 0; i < 48; i++ )
+    {
+        loadSound("sounds/lisa" + i + ".m4a", buffers, i);
     }
 }
 
@@ -249,7 +254,10 @@ function initTrackerCursor(container)
             if( partOn )
             {
                 g_voiceInfo["peter"].$avitar.addClass("playing");
-                g_soundPool.add( g_voiceInfo["tone"].buffers[note], 1,
+
+                var buffer = g_voiceInfo["lisa"].buffers[note] || g_voiceInfo["tone"].buffers[note];
+
+                g_soundPool.add( buffer, 1,
                     function()
                     {
                         g_voiceInfo["peter"].$avitar.removeClass("playing");
